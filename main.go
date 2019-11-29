@@ -48,7 +48,7 @@ func InitDB() error {
 	}
 	faker.GenerateLowSupplyData()
 	faker.GenerateRainCheckData()
-	// faker.GenerateDataFromCSVForLowSupply()
+	faker.GenerateDataFromCSVForLowSupply()
 	faker.GenerateDataFromCSVForRainCheck()
 	return nil
 }
