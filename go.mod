@@ -9,4 +9,5 @@ require (
 	github.com/jpillora/backoff v1.0.0
 	github.com/jpillora/csv-to-influxdb v0.0.0-20190731134141-fbe8908e990c
 	github.com/jpillora/opts v1.1.2
+	github.com/matm/gocov-html v0.0.0-20191111163307-9ee104d84c82 // indirect
 )
