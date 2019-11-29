@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"strconv"
 	"github.com/gorilla/mux"
 )
 
@@ -25,18 +25,18 @@ type MapBoxFeature struct {
 }
 
 type MapBoxFeatureProperty struct {
-	DBH interface{} `json:"dbh"`
+	DBH interface{} `json:"id"`
 }
 
 type MapBoxGeometry struct {
-	Type        string        `json:"point"`
-	Coordinates []json.Number `json:"coordinates"`
+	Type        string        `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
 }
 
 type Metric struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
-}
+} 
 
 type MetricRecommendation struct {
 	ID       string `json:"id"`
@@ -124,7 +124,12 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 		feature.Properties = MapBoxFeatureProperty{DBH: row[len(row)-1]}
 		feature.Geometry = MapBoxGeometry{}
 		feature.Geometry.Type = "Point"
-		feature.Geometry.Coordinates = []json.Number{row[1].(json.Number), row[2].(json.Number)}
+		longitude,_ := strconv.ParseFloat(string(row[2].(json.Number)),2)
+		longitude,_ = strconv.ParseFloat(fmt.Sprintf("%.2f",longitude),2)
+		fmt.Println("longitude = ",longitude)
+		latitude,_ := strconv.ParseFloat(string(row[2].(json.Number)),2)
+		latitude,_ = strconv.ParseFloat(fmt.Sprintf("%.2f",latitude),2)
+		feature.Geometry.Coordinates = []float64{longitude,latitude}
 		payload = append(payload, feature)
 	}
 	response := MapBox{}
