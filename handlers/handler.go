@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -74,15 +75,24 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 
 func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	serviceArea := r.URL.Query()["serviceArea"]
+	serviceType := r.URL.Query()["serviceType"]
+	var query string
 	switch vars["id"] {
 	case LOW_SUPPLY:
-
+		query = "select * from low_supply where service_area='" + serviceArea[0] + "' and service_type='" + serviceType[0] + "'"
 		break
 	case RAIN_CHECK:
-
+		query = "select * from rain_check where service_area='" + serviceArea[0] + "' and service_type='" + serviceType[0] + "'"
 		break
 	}
-	executeQuery(w, "select * from shapes")
+	response := getResponse(query)[0]
+	columns := response.Series[0].Columns
+	values := response.Series[0].Values[0]
+
+	data := createMap(columns, values)
+
+	Ok(w, data)
 }
 
 func GetServiceAreas(w http.ResponseWriter, r *http.Request) {
@@ -113,4 +123,13 @@ func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Ok(w, serviceTypes)
+}
+
+func createMap(columns []string, values []interface{}) map[string]interface{} {
+	data := make(map[string]interface{})
+	for i := 0; i < len(columns); i++ {
+		fmt.Println(columns[i], values[i])
+		data[columns[i]] = values[i]
+	}
+	return data
 }

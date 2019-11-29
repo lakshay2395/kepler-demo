@@ -19,7 +19,7 @@ func Error(w http.ResponseWriter, err error) {
 	w.Write(payload)
 }
 
-func executeQuery(w http.ResponseWriter, query string) {
+func executeQuery(w http.ResponseWriter, query string) []client.Result {
 	c := db.GetClient()
 	response, err := c.Query(client.Query{
 		Command:  query,
@@ -27,13 +27,31 @@ func executeQuery(w http.ResponseWriter, query string) {
 	})
 	if err != nil {
 		Error(w, err)
-		return
+		return nil
 	}
 	if response.Error() != nil {
 		Error(w, response.Error())
-		return
+		return nil
 	}
 	Ok(w, response.Results)
+	return response.Results
+}
+
+func getResponse(query string) []client.Result {
+	c := db.GetClient()
+	response, err := c.Query(client.Query{
+		Command:  query,
+		Database: db.GetDBName(),
+	})
+	if err != nil {
+		fmt.Println(err)
+		return nil
+	}
+	if response.Error() != nil {
+		fmt.Println(response)
+		return nil
+	}
+	return response.Results
 }
 
 func Ok(w http.ResponseWriter, response interface{}) {
