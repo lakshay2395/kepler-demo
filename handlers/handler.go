@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
+	"strconv"
 	"github.com/gorilla/mux"
 )
 
@@ -25,7 +25,7 @@ type MapBoxFeature struct {
 }
 
 type MapBoxFeatureProperty struct {
-	DBH interface{} `json:"dbh"`
+	DBH interface{} `json:"id"`
 }
 
 type MapBoxGeometry struct {
@@ -121,10 +121,12 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	for _, row := range rows {
 		feature := MapBoxFeature{}
 		feature.Type = "Feature"
-		feature.Properties = MapBoxFeatureProperty{DBH: row[len(row)-1]}
+		value,_ := strconv.ParseFloat(string(row[len(row)-1].(json.Number)),2)
+		finalValue,_ := strconv.ParseFloat(fmt.Sprintf("%.2f",value),2)
+		feature.Properties = MapBoxFeatureProperty{DBH: finalValue*100}
 		feature.Geometry = MapBoxGeometry{}
 		feature.Geometry.Type = "Point"
-		feature.Geometry.Coordinates = []json.Number{row[1].(json.Number), row[2].(json.Number)}
+		feature.Geometry.Coordinates = []json.Number{row[2].(json.Number), row[1].(json.Number)}
 		payload = append(payload, feature)
 	}
 	response := MapBox{}
