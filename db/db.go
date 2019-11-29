@@ -9,6 +9,8 @@ import (
 )
 
 var db *client.Client
+var RAIN_CHECK_MEASUREMENT = "rain_check"
+var LOW_SUPPLY_MEASUREMENT = "low_supply"
 
 func Init(hostname, port, username, password, dbName string) error {
 	host, err := url.Parse(fmt.Sprintf("http://%s:%s", hostname, port))
@@ -25,16 +27,33 @@ func Init(hostname, port, username, password, dbName string) error {
 		return err
 	}
 	db = c
+	return nil
+}
+
+func CreateDB(dbName string) error {
 	response, err := db.Query(client.Query{
 		Command:  "create database " + dbName,
 		Database: dbName,
 	})
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 	if response.Error() != nil {
-		fmt.Println(response.Error())
+		return response.Error()
+	}
+	return nil
+}
+
+func DropDB(dbName string) error {
+	response, err := db.Query(client.Query{
+		Command:  "drop database " + dbName,
+		Database: dbName,
+	})
+	if err != nil {
+		return err
+	}
+	if response.Error() != nil {
+		return response.Error()
 	}
 	return nil
 }
