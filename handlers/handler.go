@@ -57,6 +57,7 @@ type ServiceType struct {
 }
 
 func GetMetrics(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	data, err := ReadFile("metric_types")
 	if err != nil {
 		Error(w, err)
@@ -72,6 +73,7 @@ func GetMetrics(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	data, err := ReadFile("metric_recommendations")
 	if err != nil {
@@ -94,6 +96,7 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMetricsData(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	vars := mux.Vars(r)
 	var serviceType, serviceArea string
 	_, ok := r.URL.Query()["serviceArea"]
@@ -144,6 +147,7 @@ func generateSupplyCommands(service string, serviceArea string, serviceType stri
 }
 
 func GetServiceAreas(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	data, err := ReadFile("service_areas")
 	if err != nil {
 		Error(w, err)
@@ -159,6 +163,7 @@ func GetServiceAreas(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	data, err := ReadFile("service_types")
 	if err != nil {
 		Error(w, err)
@@ -171,4 +176,8 @@ func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Ok(w, serviceTypes)
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
