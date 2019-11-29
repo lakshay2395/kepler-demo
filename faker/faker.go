@@ -13,43 +13,20 @@ import (
 
 func GenerateLowSupplyData() {
 	c := db.GetClient()
-	data, err := handler.ReadFile("service_areas")
+	serviceAreas, err := GetServiceAreas()
+	if err != nil {
+		log.Fatal(err)
+	}
+	serviceTypes, err := GetServiceTypes()
 	if err != nil {
 		log.Fatal(err)
 	}
 	pts := []client.Point{}
-	serviceAreas := []handler.ServiceArea{}
-	err = json.Unmarshal(data, &serviceAreas)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data, err = handler.ReadFile("service_types")
-	if err != nil {
-		log.Fatal(err)
-	}
-	serviceTypes := []handler.ServiceType{}
-	err = json.Unmarshal(data, &serviceTypes)
-	if err != nil {
-		log.Fatal(err)
-	}
 	for _, serviceArea := range serviceAreas {
-		if serviceArea.Lat == 0 || serviceArea.Long == 0 {
-			break
-		}
-		for _, serviceType := range serviceTypes {
-			pts = append(pts, client.Point{
-				Measurement: db.LOW_SUPPLY_MEASUREMENT,
-				Tags: map[string]string{
-					"service_area": serviceArea.Name,
-					"service_type": serviceType.Name,
-				},
-				Fields: map[string]interface{}{
-					"lat":   serviceArea.Lat,
-					"long":  serviceArea.Long,
-					"value": randFloats(0.0, 1.0, 1)[0],
-				},
-				Time: time.Now(),
-			})
+		if IsLatLongPresentInServiceArea(serviceArea) {
+			for _, serviceType := range serviceTypes {
+				pts = append(pts, GenerateClientPoint(db.LOW_SUPPLY_MEASUREMENT, serviceArea, serviceType, rand.Float64()))
+			}
 		}
 	}
 	bps := client.BatchPoints{
@@ -64,43 +41,20 @@ func GenerateLowSupplyData() {
 
 func GenerateRainCheckData() {
 	c := db.GetClient()
-	data, err := handler.ReadFile("service_areas")
+	serviceAreas, err := GetServiceAreas()
+	if err != nil {
+		log.Fatal(err)
+	}
+	serviceTypes, err := GetServiceTypes()
 	if err != nil {
 		log.Fatal(err)
 	}
 	pts := []client.Point{}
-	serviceAreas := []handler.ServiceArea{}
-	err = json.Unmarshal(data, &serviceAreas)
-	if err != nil {
-		log.Fatal(err)
-	}
-	data, err = handler.ReadFile("service_types")
-	if err != nil {
-		log.Fatal(err)
-	}
-	serviceTypes := []handler.ServiceType{}
-	err = json.Unmarshal(data, &serviceTypes)
-	if err != nil {
-		log.Fatal(err)
-	}
 	for _, serviceArea := range serviceAreas {
-		if serviceArea.Lat == 0 || serviceArea.Long == 0 {
-			break
-		}
-		for _, serviceType := range serviceTypes {
-			pts = append(pts, client.Point{
-				Measurement: db.RAIN_CHECK_MEASUREMENT,
-				Tags: map[string]string{
-					"service_area": serviceArea.Name,
-					"service_type": serviceType.Name,
-				},
-				Fields: map[string]interface{}{
-					"lat":   serviceArea.Lat,
-					"long":  serviceArea.Long,
-					"value": randBoolean(randFloats(0.0, 1.0, 1)[0]),
-				},
-				Time: time.Now(),
-			})
+		if IsLatLongPresentInServiceArea(serviceArea) {
+			for _, serviceType := range serviceTypes {
+				pts = append(pts, GenerateClientPoint(db.RAIN_CHECK_MEASUREMENT, serviceArea, serviceType, randomBoolean()))
+			}
 		}
 	}
 	bps := client.BatchPoints{
@@ -113,15 +67,54 @@ func GenerateRainCheckData() {
 	}
 }
 
-func randFloats(min, max float64, n int) []float64 {
-	res := make([]float64, n)
-	for i := range res {
-		res[i] = min + rand.Float64()*(max-min)
-	}
-	return res
+func IsLatLongPresentInServiceArea(serviceArea handler.ServiceArea) bool {
+	return serviceArea.Lat != 0 && serviceArea.Long != 0
 }
 
-func randBoolean(x float64) bool {
+func GetServiceAreas() ([]handler.ServiceArea, error) {
+	data, err := handler.ReadFile("service_areas")
+	if err != nil {
+		return nil, err
+	}
+	serviceAreas := []handler.ServiceArea{}
+	err = json.Unmarshal(data, &serviceAreas)
+	if err != nil {
+		return nil, err
+	}
+	return serviceAreas, nil
+}
+
+func GetServiceTypes() ([]handler.ServiceType, error) {
+	data, err := handler.ReadFile("service_types")
+	if err != nil {
+		return nil, err
+	}
+	serviceTypes := []handler.ServiceType{}
+	err = json.Unmarshal(data, &serviceTypes)
+	if err != nil {
+		return nil, err
+	}
+	return serviceTypes, nil
+}
+
+func GenerateClientPoint(measurementName string, serviceArea handler.ServiceArea, serviceType handler.ServiceType, value interface{}) client.Point {
+	return client.Point{
+		Measurement: measurementName,
+		Tags: map[string]string{
+			"service_area": serviceArea.Name,
+			"service_type": serviceType.Name,
+		},
+		Fields: map[string]interface{}{
+			"lat":   serviceArea.Lat,
+			"long":  serviceArea.Long,
+			"value": value,
+		},
+		Time: time.Now(),
+	}
+}
+
+func randomBoolean() bool {
+	x := rand.Float64()
 	if x > 0.5 {
 		return true
 	}
