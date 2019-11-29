@@ -1,6 +1,11 @@
 package handler
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
 
 type Metric struct {
 	ID   string `json:"id"`
@@ -23,21 +28,23 @@ func GetMetrics(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
-
-	// data, err := ReadFile("metric_recommendations")
-	// if err != nil {
-	// 	Error(w, err)
-	// 	return
-	// }
-	// recommendations := []MetricRecommendation{}
-	// err = json.Unmarshal(data, &payload)
-	// if err != nil {
-	// 	Error(w, err)
-	// 	return
-	// }
-	// rec := []MetricRecommendation{}
-	// for _,recommendation := range recommendations{
-	// 	if recommendation.ID
-	// }
-	// Ok(w, data)
+	vars := mux.Vars(r)
+	data, err := ReadFile("metric_recommendations")
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	recommendations := []MetricRecommendation{}
+	err = json.Unmarshal(data, &recommendations)
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	list := []MetricRecommendation{}
+	for _, recommendation := range recommendations {
+		if recommendation.ID == vars["id"] {
+			list = append(list, recommendation)
+		}
+	}
+	Ok(w, list)
 }
