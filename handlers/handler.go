@@ -75,24 +75,44 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 
 func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	serviceArea := r.URL.Query()["serviceArea"]
-	serviceType := r.URL.Query()["serviceType"]
+	var serviceType, serviceArea string
+	_, ok := r.URL.Query()["serviceArea"]
+	if ok {
+		serviceArea = r.URL.Query()["serviceArea"][0]
+	}
+	_, ok = r.URL.Query()["serviceType"]
+	if ok {
+		serviceType = r.URL.Query()["serviceType"][0]
+	}
 	var query string
 	switch vars["id"] {
 	case LOW_SUPPLY:
-		query = "select * from low_supply where service_area='" + serviceArea[0] + "' and service_type='" + serviceType[0] + "'"
+		query = generateSupplyCommands("select * from low_supply where ", serviceArea, serviceType)
 		break
 	case RAIN_CHECK:
-		query = "select * from rain_check where service_area='" + serviceArea[0] + "' and service_type='" + serviceType[0] + "'"
+		query = generateSupplyCommands("select * from rain_check where ", serviceArea, serviceType)
 		break
 	}
 	response := getResponse(query)[0]
 	columns := response.Series[0].Columns
-	values := response.Series[0].Values[0]
+	values := response.Series[0].Values
 
 	data := createMap(columns, values)
 
 	Ok(w, data)
+}
+
+func generateSupplyCommands(service string, serviceArea string, serviceType string) string {
+	var query string
+	if len(serviceArea) > 0 && len(serviceType) > 0 {
+		query = service + "service_area='" + serviceArea + "' and service_type='" + serviceType + "'"
+	} else if len(serviceArea) > 0 {
+		query = service + "service_area='" + serviceArea + "'"
+	} else if len(serviceType) > 0 {
+		query = service + "service_types='" + serviceType + "'"
+	}
+	fmt.Println(query)
+	return query
 }
 
 func GetServiceAreas(w http.ResponseWriter, r *http.Request) {
@@ -125,8 +145,9 @@ func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
 	Ok(w, serviceTypes)
 }
 
-func createMap(columns []string, values []interface{}) map[string]interface{} {
-	data := make(map[string]interface{})
+func createMap(columns []string, values [][]interface{}) map[string]interface{} {
+	date := make(map[string]interface{})
+
 	for i := 0; i < len(columns); i++ {
 		fmt.Println(columns[i], values[i])
 		data[columns[i]] = values[i]

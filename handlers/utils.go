@@ -47,10 +47,6 @@ func getResponse(query string) []client.Result {
 		fmt.Println(err)
 		return nil
 	}
-	if response.Error() != nil {
-		fmt.Println(response)
-		return nil
-	}
 	return response.Results
 }
 
