@@ -17,12 +17,12 @@ func initEnv() {
 	os.Setenv("INFLUX_USERNAME", "")
 	os.Setenv("INFLUX_PASSWORD", "")
 	os.Setenv("PORT", "8080")
+	os.Setenv("DB_NAME", "BumbeBeeTuna")
 }
 
 func main() {
 	initEnv() //TODO: to remove after finalization
-
-	err := db.Init(os.Getenv("INFLUX_HOST"), os.Getenv("INFLUX_PORT"), os.Getenv("INFLUX_USERNAME"), os.Getenv("INFLUX_PASSWORD"))
+	err := db.Init(os.Getenv("INFLUX_HOST"), os.Getenv("INFLUX_PORT"), os.Getenv("INFLUX_USERNAME"), os.Getenv("INFLUX_PASSWORD"), os.Getenv("DB_NAME"))
 	if err != nil {
 		log.Fatal(err)
 	}

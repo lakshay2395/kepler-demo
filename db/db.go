@@ -3,13 +3,14 @@ package db
 import (
 	"fmt"
 	"net/url"
+	"os"
 
 	client "github.com/influxdata/influxdb1-client"
 )
 
 var db *client.Client
 
-func Init(hostname, port, username, password string) error {
+func Init(hostname, port, username, password, dbName string) error {
 	host, err := url.Parse(fmt.Sprintf("http://%s:%s", hostname, port))
 	if err != nil {
 		return err
@@ -25,8 +26,8 @@ func Init(hostname, port, username, password string) error {
 	}
 	db = c
 	response, err := db.Query(client.Query{
-		Command:  "create database BumbeBeeTuna",
-		Database: "BumbeBeeTuna",
+		Command:  "create database " + dbName,
+		Database: dbName,
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -41,4 +42,8 @@ func Init(hostname, port, username, password string) error {
 
 func GetClient() *client.Client {
 	return db
+}
+
+func GetDBName() string {
+	return os.Getenv("DB_NAME")
 }

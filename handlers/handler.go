@@ -2,45 +2,60 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
-	client "github.com/influxdata/influxdb1-client"
-	"github.com/lakshay2395/kepler-demo/db"
+	"github.com/gorilla/mux"
 )
 
-//Default db name
-var DB_NAME string = "BumbeBeeTuna"
-
-func Error(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusInternalServerError)
-	response := map[string]string{}
-	response["error"] = fmt.Sprintf("%s", err)
-	payload, _ := json.Marshal(response)
-	w.Write(payload)
+type Metric struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
-func executeQuery(w http.ResponseWriter, query string) {
-	db := db.GetClient()
-	response, err := db.Query(client.Query{
-		Command:  query,
-		Database: DB_NAME,
-	})
+type MetricRecommendation struct {
+	ID       string `json:"id"`
+	MetricID string `json:"metric_id"`
+	Name     string `json:"name"`
+}
+
+func GetMetrics(w http.ResponseWriter, r *http.Request) {
+	data, err := ReadFile("metric_types")
 	if err != nil {
 		Error(w, err)
 		return
 	}
-	if response.Error() != nil {
-		Error(w, response.Error())
+	metrics := []Metric{}
+	err = json.Unmarshal(data, &metrics)
+	if err != nil {
+		Error(w, err)
 		return
 	}
-	Ok(w, response.Results)
+	Ok(w, metrics)
 }
 
-func Ok(w http.ResponseWriter, response interface{}) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	payload, _ := json.Marshal(response)
-	w.Write(payload)
+func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	data, err := ReadFile("metric_recommendations")
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	recommendations := []MetricRecommendation{}
+	err = json.Unmarshal(data, &recommendations)
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	list := []MetricRecommendation{}
+	for _, recommendation := range recommendations {
+		if recommendation.MetricID == vars["id"] {
+			list = append(list, recommendation)
+		}
+	}
+	Ok(w, list)
+}
+
+func GetMetricsData(w http.ResponseWriter, r *http.Request) {
+	// vars := mux.Vars(r)
+	executeQuery(w, "select * from shapes")
 }
