@@ -4,14 +4,10 @@ import (
 	"fmt"
 	"net/url"
 
-	client "github.com/influxdata/influxdb1-client"
+	client "github.com/influxdata/influxdb1-client/v2"
 )
 
 var db *client.Client
-
-type Client interface {
-	Get(query string)
-}
 
 func Init(hostname, port, username, password string) error {
 	host, err := url.Parse(fmt.Sprintf("http://%s:%s", hostname, port))
