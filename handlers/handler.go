@@ -172,13 +172,3 @@ func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
 	}
 	Ok(w, serviceTypes)
 }
-
-// func createMap(columns []string, values [][]interface{}) map[string]interface{} {
-// 	date := make(map[string]interface{})
-
-// 	for i := 0; i < len(columns); i++ {
-// 		fmt.Println(columns[i], values[i])
-// 		data[columns[i]] = values[i]
-// 	}
-// 	return data
-// }

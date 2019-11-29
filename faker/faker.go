@@ -53,7 +53,7 @@ func GenerateRainCheckData() {
 	for _, serviceArea := range serviceAreas {
 		if IsLatLongPresentInServiceArea(serviceArea) {
 			for _, serviceType := range serviceTypes {
-				pts = append(pts, GenerateClientPoint(db.RAIN_CHECK_MEASUREMENT, serviceArea, serviceType, randomBoolean()))
+				pts = append(pts, GenerateClientPoint(db.RAIN_CHECK_MEASUREMENT, serviceArea, serviceType, rand.Float64()))
 			}
 		}
 	}
@@ -111,12 +111,4 @@ func GenerateClientPoint(measurementName string, serviceArea handler.ServiceArea
 		},
 		Time: time.Now(),
 	}
-}
-
-func randomBoolean() bool {
-	x := rand.Float64()
-	if x > 0.5 {
-		return true
-	}
-	return false
 }
