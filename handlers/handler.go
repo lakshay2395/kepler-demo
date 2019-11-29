@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -72,6 +73,9 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 
 func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	serviceArea := r.URL.Query()["serviceArea"]
+	serviceType := r.URL.Query()["serviceType"]
+	fmt.Println("select * from shapes where serviceArea = " + serviceArea[0] + " and serviceType = " + serviceType[0])
 	switch vars["id"] {
 	case LOW_SUPPLY:
 
