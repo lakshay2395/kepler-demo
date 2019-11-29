@@ -15,8 +15,8 @@ import (
 	handler "github.com/lakshay2395/kepler-demo/handlers"
 )
 
-func GenerateDataFromCSV() {
-	csv_file, ferr := os.Open(os.Getenv("CSV_FILE"))
+func GenerateDataFromCSVForLowSupply() {
+	csv_file, ferr := os.Open(os.Getenv("LOW_SUPPLY_DATA"))
 	if ferr != nil {
 		log.Fatal(ferr)
 	}
@@ -40,6 +40,43 @@ func GenerateDataFromCSV() {
 			Tags: map[string]string{
 				"service_area": "Jabodetabek",
 				"service_type": "car",
+			},
+			Fields: map[string]interface{}{
+				"lat":   latValue,
+				"long":  longValue,
+				"value": rand.Float64(),
+			},
+			Time: time.Now(),
+		})
+	}
+	writeDataToDB(pts)
+}
+
+func GenerateDataFromCSVForRainCheck() {
+	csv_file, ferr := os.Open(os.Getenv("RAIN_CHECK_DATA"))
+	if ferr != nil {
+		log.Fatal(ferr)
+	}
+	r := csv.NewReader(csv_file)
+	pts := []client.Point{}
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		latValue, err := strconv.ParseFloat(record[6], 32)
+		longValue, err := strconv.ParseFloat(record[7], 32)
+
+		pts = append(pts, client.Point{
+			Measurement: db.RAIN_CHECK_MEASUREMENT,
+			Tags: map[string]string{
+				"service_area": "Jabodetabek",
+				"service_type": "ride",
 			},
 			Fields: map[string]interface{}{
 				"lat":   latValue,
