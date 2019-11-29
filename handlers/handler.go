@@ -30,7 +30,7 @@ type MapBoxFeatureProperty struct {
 
 type MapBoxGeometry struct {
 	Type        string        `json:"type"`
-	Coordinates []float64 `json:"coordinates"`
+	Coordinates []json.Number `json:"coordinates"`
 }
 
 type Metric struct {
