@@ -38,7 +38,7 @@ func GenerateDataFromCSV() {
 		pts = append(pts, client.Point{
 			Measurement: db.LOW_SUPPLY_MEASUREMENT,
 			Tags: map[string]string{
-				"service_area": "Yogyakarta",
+				"service_area": "Jabodetabek",
 				"service_type": "car",
 			},
 			Fields: map[string]interface{}{
