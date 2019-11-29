@@ -19,6 +19,7 @@ func initEnv() {
 	os.Setenv("INFLUX_PASSWORD", "")
 	os.Setenv("PORT", "8090")
 	os.Setenv("DB_NAME", "keplerDemo")
+	os.Setenv("CSV_FILE", "data/Jakarta_data.csv")
 }
 
 func main() {
@@ -46,5 +47,6 @@ func InitDB() error {
 	}
 	faker.GenerateLowSupplyData()
 	faker.GenerateRainCheckData()
+	faker.GenerateDataFromCSV()
 	return nil
 }

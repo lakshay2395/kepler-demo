@@ -1,15 +1,69 @@
 package faker
 
 import (
+	"encoding/csv"
 	"encoding/json"
+	"io"
 	"log"
 	"math/rand"
+	"os"
+	"strconv"
 	"time"
 
 	client "github.com/influxdata/influxdb1-client"
 	"github.com/lakshay2395/kepler-demo/db"
 	handler "github.com/lakshay2395/kepler-demo/handlers"
 )
+
+func GenerateDataFromCSV() {
+	csv_file, ferr := os.Open(os.Getenv("CSV_FILE"))
+	if ferr != nil {
+		log.Fatal(ferr)
+	}
+	r := csv.NewReader(csv_file)
+	pts := []client.Point{}
+
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		latValue, err := strconv.ParseFloat(record[6], 32)
+		longValue, err := strconv.ParseFloat(record[7], 32)
+
+		pts = append(pts, client.Point{
+			Measurement: db.LOW_SUPPLY_MEASUREMENT,
+			Tags: map[string]string{
+				"service_area": "Yogyakarta",
+				"service_type": "car",
+			},
+			Fields: map[string]interface{}{
+				"lat":   latValue,
+				"long":  longValue,
+				"value": rand.Float64(),
+			},
+			Time: time.Now(),
+		})
+	}
+	writeDataToDB(pts)
+}
+
+func writeDataToDB(pts []client.Point) {
+
+	c := db.GetClient()
+	bps := client.BatchPoints{
+		Points:   pts,
+		Database: db.GetDBName(),
+	}
+	_, err := c.Write(bps)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 
 func GenerateLowSupplyData() {
 	c := db.GetClient()
