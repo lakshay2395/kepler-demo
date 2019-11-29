@@ -110,10 +110,10 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	var query string
 	switch vars["id"] {
 	case LOW_SUPPLY:
-		query = generateSupplyCommands("select * from low_supply where ", serviceArea, serviceType)
+		query = generateSupplyCommands("select * from low_supply ", serviceArea, serviceType)
 		break
 	case RAIN_CHECK:
-		query = generateSupplyCommands("select * from rain_check where ", serviceArea, serviceType)
+		query = generateSupplyCommands("select * from rain_check ", serviceArea, serviceType)
 		break
 	}
 	rows := getResponse(query)[0].Series[0].Values
@@ -136,11 +136,13 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 func generateSupplyCommands(service string, serviceArea string, serviceType string) string {
 	var query string
 	if len(serviceArea) > 0 && len(serviceType) > 0 {
-		query = service + "service_area='" + serviceArea + "' and service_type='" + serviceType + "'"
+		query = service + "where service_area='" + serviceArea + "' and service_type='" + serviceType + "'"
 	} else if len(serviceArea) > 0 {
-		query = service + "service_area='" + serviceArea + "'"
+		query = service + "where service_area='" + serviceArea + "'"
 	} else if len(serviceType) > 0 {
-		query = service + "service_type='" + serviceType + "'"
+		query = service + "where service_type='" + serviceType + "'"
+	} else {
+		query = service
 	}
 	fmt.Println(query)
 	return query
