@@ -25,7 +25,7 @@ func Error(w http.ResponseWriter, err error) {
 func CreateDB() {
 	db := db.GetClient()
 	response, err := db.Query(client.Query{
-		Command:  "create database stargate_ui",
+		Command:  "create database BumbeBeeTuna",
 		Database: DB_NAME,
 	})
 	if err != nil {
@@ -69,4 +69,13 @@ func Ok(w http.ResponseWriter, response interface{}) {
 
 func ReadFile(name string) ([]byte, error) {
 	return ioutil.ReadFile(fmt.Sprint("data/%s.json", name))
+}
+
+func Error(w http.ResponseWriter, err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	response := map[string]string{}
+	response["error"] = fmt.Sprintf("%s", err)
+	payload, _ := json.Marshal(response)
+	w.Write(payload)
 }
