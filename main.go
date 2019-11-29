@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lakshay2395/kepler-demo/db"
+	handler "github.com/lakshay2395/kepler-demo/handlers"
 	"github.com/lakshay2395/kepler-demo/routes"
 )
 
@@ -21,6 +22,7 @@ func initEnv() {
 
 func main() {
 	initEnv() //TODO: to remove after finalization
+	handler.CreateDB()
 	err := db.Init(os.Getenv("INFLUX_HOST"), os.Getenv("INFLUX_PORT"), os.Getenv("INFLUX_USERNAME"), os.Getenv("INFLUX_PASSWORD"))
 	if err != nil {
 		log.Fatal(err)
