@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	client "github.com/influxdata/influxdb1-client/v2"
+	client "github.com/influxdata/influxdb1-client"
 )
 
 var db *client.Client

@@ -11,15 +11,15 @@ import (
 )
 
 //Default db name
-var DB_NAME string = "stargate_ui"
+var DB_NAME string = "BumbeBeeTuna"
 
-func GetMetrics(w http.ResponseWriter, r *http.Request) {
-	data, err := ReadFile("metric_types")
-	if err != nil {
-		Error(w, err)
-		return
-	}
-	Ok(w, data)
+func Error(w http.ResponseWriter, err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusInternalServerError)
+	response := map[string]string{}
+	response["error"] = fmt.Sprintf("%s", err)
+	payload, _ := json.Marshal(response)
+	w.Write(payload)
 }
 
 func CreateDB() {
@@ -37,16 +37,6 @@ func CreateDB() {
 	}
 	fmt.Println("Created dB succesfully")
 	return
-}
-
-func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
-	data, err := ReadFile("metric_recommendations")
-	if err != nil {
-		Error(w, err)
-		return
-	}
-
-	Ok(w, data)
 }
 
 func GetTripsList(w http.ResponseWriter, r *http.Request) {
