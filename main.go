@@ -17,7 +17,7 @@ func initEnv() {
 	os.Setenv("INFLUX_PORT", "8086")
 	os.Setenv("INFLUX_USERNAME", "")
 	os.Setenv("INFLUX_PASSWORD", "")
-	os.Setenv("PORT", "8080")
+	os.Setenv("PORT", "8090")
 	os.Setenv("DB_NAME", "keplerDemo")
 }
 
