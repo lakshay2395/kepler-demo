@@ -2,6 +2,8 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -24,10 +26,17 @@ func GetMetrics(w http.ResponseWriter, r *http.Request) {
 		Error(w, err)
 		return
 	}
-	Ok(w, data)
+	metrics := []Metric{}
+	err = json.Unmarshal(data, &metrics)
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	Ok(w, metrics)
 }
 
 func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("yoyo")
 	vars := mux.Vars(r)
 	data, err := ReadFile("metric_recommendations")
 	if err != nil {
@@ -42,9 +51,13 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 	}
 	list := []MetricRecommendation{}
 	for _, recommendation := range recommendations {
-		if recommendation.ID == vars["id"] {
+		if recommendation.MetricID == vars["id"] {
 			list = append(list, recommendation)
 		}
 	}
 	Ok(w, list)
+}
+
+func ReadFile(name string) ([]byte, error) {
+	return ioutil.ReadFile(fmt.Sprintf("data/%s.json", name))
 }
