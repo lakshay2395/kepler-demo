@@ -13,6 +13,26 @@ const (
 	RAIN_CHECK = "2"
 )
 
+type MapBox struct {
+	Type     string          `json:"type"`
+	Features []MapBoxFeature `json:"features"`
+}
+
+type MapBoxFeature struct {
+	Type       string                `json:"type"`
+	Properties MapBoxFeatureProperty `json:"properties"`
+	Geometry   MapBoxGeometry        `json:"geometry"`
+}
+
+type MapBoxFeatureProperty struct {
+	DBH interface{} `json:"dbh"`
+}
+
+type MapBoxGeometry struct {
+	Type        string        `json:"point"`
+	Coordinates []json.Number `json:"coordinates"`
+}
+
 type Metric struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
@@ -93,13 +113,21 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 		query = generateSupplyCommands("select * from rain_check where ", serviceArea, serviceType)
 		break
 	}
-	response := getResponse(query)[0]
-	columns := response.Series[0].Columns
-	values := response.Series[0].Values
-
-	data := createMap(columns, values)
-
-	Ok(w, data)
+	rows := getResponse(query)[0].Series[0].Values
+	payload := []MapBoxFeature{}
+	for _, row := range rows {
+		feature := MapBoxFeature{}
+		feature.Type = "Feature"
+		feature.Properties = MapBoxFeatureProperty{DBH: row[len(row)-1]}
+		feature.Geometry = MapBoxGeometry{}
+		feature.Geometry.Type = "Point"
+		feature.Geometry.Coordinates = []json.Number{row[1].(json.Number), row[2].(json.Number)}
+		payload = append(payload, feature)
+	}
+	response := MapBox{}
+	response.Type = "FeatureCollection"
+	response.Features = payload
+	Ok(w, response)
 }
 
 func generateSupplyCommands(service string, serviceArea string, serviceType string) string {
@@ -109,7 +137,7 @@ func generateSupplyCommands(service string, serviceArea string, serviceType stri
 	} else if len(serviceArea) > 0 {
 		query = service + "service_area='" + serviceArea + "'"
 	} else if len(serviceType) > 0 {
-		query = service + "service_types='" + serviceType + "'"
+		query = service + "service_type='" + serviceType + "'"
 	}
 	fmt.Println(query)
 	return query
@@ -145,12 +173,12 @@ func GetServiceTypes(w http.ResponseWriter, r *http.Request) {
 	Ok(w, serviceTypes)
 }
 
-func createMap(columns []string, values [][]interface{}) map[string]interface{} {
-	date := make(map[string]interface{})
+// func createMap(columns []string, values [][]interface{}) map[string]interface{} {
+// 	date := make(map[string]interface{})
 
-	for i := 0; i < len(columns); i++ {
-		fmt.Println(columns[i], values[i])
-		data[columns[i]] = values[i]
-	}
-	return data
-}
+// 	for i := 0; i < len(columns); i++ {
+// 		fmt.Println(columns[i], values[i])
+// 		data[columns[i]] = values[i]
+// 	}
+// 	return data
+// }
