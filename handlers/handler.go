@@ -3,17 +3,43 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	client "github.com/influxdata/influxdb1-client"
 	"github.com/lakshay2395/kepler-demo/db"
 )
 
+//Default db name
+var DB_NAME string = "stargate_ui"
+
+func GetMetrics(w http.ResponseWriter, r *http.Request) {
+	data, err := ReadFile("metric_types")
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	Ok(w, data)
+}
+
+func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
+	data, err := ReadFile("metric_recommendations")
+	if err != nil {
+		Error(w, err)
+		return
+	}
+	Ok(w, data)
+}
+
 func GetTripsList(w http.ResponseWriter, r *http.Request) {
+	executeQuery(w, "select * from shapes")
+}
+
+func executeQuery(w http.ResponseWriter, query string) {
 	db := db.GetClient()
 	response, err := db.Query(client.Query{
-		Command:  "select * from shapes",
-		Database: "BumbeBeeTuna",
+		Command:  query,
+		Database: DB_NAME,
 	})
 	if err != nil {
 		Error(w, err)
@@ -40,4 +66,8 @@ func Ok(w http.ResponseWriter, response interface{}) {
 	w.WriteHeader(http.StatusOK)
 	payload, _ := json.Marshal(response)
 	w.Write(payload)
+}
+
+func ReadFile(name string) ([]byte, error) {
+	return ioutil.ReadFile(fmt.Sprint("data/%s.json", name))
 }
