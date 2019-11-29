@@ -25,7 +25,7 @@ func GenerateLowSupplyData() {
 	for _, serviceArea := range serviceAreas {
 		if IsLatLongPresentInServiceArea(serviceArea) {
 			for _, serviceType := range serviceTypes {
-				pts = append(pts, GenerateClientPoint(db.LOW_SUPPLY_MEASUREMENT, serviceArea, serviceType, rand.Float64()))
+				pts = append(pts, GenerateClientPoint(db.LOW_SUPPLY_MEASUREMENT, serviceArea, serviceType, rand.Float64(), time.Now()))
 			}
 		}
 	}
@@ -53,7 +53,7 @@ func GenerateRainCheckData() {
 	for _, serviceArea := range serviceAreas {
 		if IsLatLongPresentInServiceArea(serviceArea) {
 			for _, serviceType := range serviceTypes {
-				pts = append(pts, GenerateClientPoint(db.RAIN_CHECK_MEASUREMENT, serviceArea, serviceType, rand.Float64()))
+				pts = append(pts, GenerateClientPoint(db.RAIN_CHECK_MEASUREMENT, serviceArea, serviceType, rand.Float64(), time.Now()))
 			}
 		}
 	}
@@ -72,7 +72,7 @@ func IsLatLongPresentInServiceArea(serviceArea handler.ServiceArea) bool {
 }
 
 func GetServiceAreas() ([]handler.ServiceArea, error) {
-	data, err := handler.ReadFile("service_areas")
+	data, err := handler.ReadFile("data/service_areas")
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func GetServiceAreas() ([]handler.ServiceArea, error) {
 }
 
 func GetServiceTypes() ([]handler.ServiceType, error) {
-	data, err := handler.ReadFile("service_types")
+	data, err := handler.ReadFile("data/service_types")
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func GetServiceTypes() ([]handler.ServiceType, error) {
 	return serviceTypes, nil
 }
 
-func GenerateClientPoint(measurementName string, serviceArea handler.ServiceArea, serviceType handler.ServiceType, value interface{}) client.Point {
+func GenerateClientPoint(measurementName string, serviceArea handler.ServiceArea, serviceType handler.ServiceType, value interface{}, t time.Time) client.Point {
 	return client.Point{
 		Measurement: measurementName,
 		Tags: map[string]string{
@@ -109,6 +109,6 @@ func GenerateClientPoint(measurementName string, serviceArea handler.ServiceArea
 			"long":  serviceArea.Long,
 			"value": value,
 		},
-		Time: time.Now(),
+		Time: t,
 	}
 }
