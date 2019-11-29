@@ -28,6 +28,7 @@ func GetMetricRecommendations(w http.ResponseWriter, r *http.Request) {
 		Error(w, err)
 		return
 	}
+
 	Ok(w, data)
 }
 
