@@ -29,14 +29,14 @@ type MapBoxFeatureProperty struct {
 }
 
 type MapBoxGeometry struct {
-	Type        string        `json:"point"`
-	Coordinates []json.Number `json:"coordinates"`
+	Type        string        `json:"type"`
+	Coordinates []float64 `json:"coordinates"`
 }
 
 type Metric struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
-}
+} 
 
 type MetricRecommendation struct {
 	ID       string `json:"id"`
