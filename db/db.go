@@ -36,7 +36,6 @@ func Init(hostname, port, username, password, dbName string) error {
 	if response.Error() != nil {
 		fmt.Println(response.Error())
 	}
-	fmt.Println("Created dB succesfully")
 	return nil
 }
 
