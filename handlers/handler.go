@@ -24,8 +24,10 @@ type MetricRecommendation struct {
 }
 
 type ServiceArea struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID   int     `json:"id"`
+	Name string  `json:"name"`
+	Lat  float64 `json:"lat"`
+	Long float64 `json:"long"`
 }
 
 type ServiceType struct {
