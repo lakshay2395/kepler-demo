@@ -49,6 +49,7 @@ func DropDB(dbName string) error {
 		Command:  "drop database " + dbName,
 		Database: dbName,
 	})
+	db = nil
 	if err != nil {
 		return err
 	}
