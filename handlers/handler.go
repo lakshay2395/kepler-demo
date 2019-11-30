@@ -26,6 +26,7 @@ type MapBoxFeature struct {
 
 type MapBoxFeatureProperty struct {
 	DBH interface{} `json:"id"`
+	Value interface{} `json:"value"`
 }
 
 type MapBoxGeometry struct {
@@ -118,12 +119,14 @@ func GetMetricsData(w http.ResponseWriter, r *http.Request) {
 	}
 	rows := getResponse(query)[0].Series[0].Values
 	payload := []MapBoxFeature{}
+	i := 0
 	for _, row := range rows {
+		i = i+1
 		feature := MapBoxFeature{}
 		feature.Type = "Feature"
 		value,_ := strconv.ParseFloat(string(row[len(row)-1].(json.Number)),2)
 		finalValue,_ := strconv.ParseFloat(fmt.Sprintf("%.2f",value),2)
-		feature.Properties = MapBoxFeatureProperty{DBH: finalValue*100}
+		feature.Properties = MapBoxFeatureProperty{DBH:i, Value: finalValue*100,}
 		feature.Geometry = MapBoxGeometry{}
 		feature.Geometry.Type = "Point"
 		feature.Geometry.Coordinates = []json.Number{row[2].(json.Number), row[1].(json.Number)}
