@@ -1,4 +1,4 @@
-package handler
+package handlers
 
 import (
 	"encoding/json"
@@ -58,5 +58,5 @@ func Ok(w http.ResponseWriter, response interface{}) {
 }
 
 func ReadFile(name string) ([]byte, error) {
-	return ioutil.ReadFile(fmt.Sprintf("data/%s.json", name))
+	return ioutil.ReadFile(fmt.Sprintf("%s.json", name))
 }
