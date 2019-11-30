@@ -163,7 +163,7 @@ func IsLatLongPresentInServiceArea(serviceArea handler.ServiceArea) bool {
 }
 
 func GetServiceAreas() ([]handler.ServiceArea, error) {
-	data, err := handler.ReadFile("data/service_areas")
+	data, err := handler.ReadFile("service_areas")
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func GetServiceAreas() ([]handler.ServiceArea, error) {
 }
 
 func GetServiceTypes() ([]handler.ServiceType, error) {
-	data, err := handler.ReadFile("data/service_types")
+	data, err := handler.ReadFile("service_types")
 	if err != nil {
 		return nil, err
 	}
