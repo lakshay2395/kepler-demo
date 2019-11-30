@@ -1,8 +1,9 @@
 package db
 
-import "testing"
-
-import "os"
+import (
+	"os"
+	"testing"
+)
 
 func TestGetClient(t *testing.T) {
 	hostname := "localhost"
@@ -20,4 +21,15 @@ func TestGetDBName(t *testing.T) {
 	if dbName != os.Getenv("DB_NAME") {
 		t.Fatalf("Expected value to be %v, but got %v", dbName, os.Getenv("DB_NAME"))
 	}
+}
+
+func TestDropDB(t *testing.T) {
+	dBName := GetDBName()
+	DropDB(dBName)
+	if GetClient() != nil {
+		t.Error("Error delete database !")
+	}
+	hostname := "localhost"
+	port := "8090"
+	Init(hostname, port, "", "", "")
 }

@@ -29,7 +29,36 @@
         ```
    - "/metrics/{id}/data" - (GET) Data for the metrics
         ```
-        
+	{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 0.6046602879796196
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.85,
+                    106.85
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "id": 0.9405090880450124
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    106.85,
+                    106.85
+                ]
+            }
+        }]
+}	        
         ```
    - "/service-types" - (GET) List of service types available
         ```
